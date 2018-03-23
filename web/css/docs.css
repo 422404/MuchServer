@@ -1,0 +1,86 @@
+.docs-bloc {
+    position: relative;
+    color: #444;
+    border-radius: 5px;
+    background-color: #eee;
+    border: 1px solid #aaa;
+    width: 80%;
+    margin: auto;
+    margin-bottom: 50px;
+    padding: 0.5em;
+}
+
+.docs-bloc-titre {
+    color: #444;
+    background-color: #fff;
+    border: 1px solid #aaa;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px #bbb;
+    font-size: 1.2em;
+}
+
+.docs-bloc-body {
+    margin-bottom: 2.5em;
+}
+
+.docs-bloc-footer {
+    height: 30px;
+    border-top: 1px solid #aaa;
+    background-color: #ddd;
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
+.docs-sous-titre {
+  font-size: 1.1em;
+  border: 1px solid #aaa;
+  background-color: white;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.docs-code {
+  color: #444;
+  border-radius: 5px;
+  background-color: #eee;
+  border: 1px solid #aaa;
+  padding: 5px;
+  background-color: white;
+}
+
+.docs-code-instruction {
+  color: #ff4d4d;
+  border-radius: 5px;
+  background-color: #eee;
+  border: 1px solid #aaa;
+  padding-left: 3px;
+  padding-right: 3px;
+  background-color: white;
+}
+
+.docs-code-lien {
+  color: #668cff;
+  border-radius: 5px;
+  background-color: #eee;
+  border: 1px solid #aaa;
+  padding-left: 3px;
+  padding-right: 3px;
+  background-color: white;
+}
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+a:visited {
+  color: blue;
+}
+
+li {
+  margin-bottom: 5px;
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MuchServer - Système de template</title>
+    <link rel="stylesheet" href="/css/docs.css" />
+  </head>
+  
+  <body>
+    <fieldset class="docs-bloc">
+      <legend class="docs-bloc-titre">Introduction&nbsp;:</legend>
+      <div class="docs-bloc-body">
+        <p>
+          MuchServer offre un système de templates permettant de faire des pages
+          web dynamiques <del>aussi bien qu'avec PHP</del> !
+          <br />
+          <br />
+          Les templates sont à placer dans le dossier 
+          <span class="docs-code-lien">&lt;ton_appli&gt;/src/vues/</span>.
+          <br />
+          Une template doit avoir pour extension
+          <span class="docs-code-lien">.template</span>.
+        </p>
+      </div>
+      <div class="docs-bloc-footer"></div>
+    </fieldset>
+    
+    <fieldset class="docs-bloc">
+      <legend class="docs-bloc-titre">Les bases&nbsp;:</legend>
+      <div class="docs-bloc-body">
+        <p>
+          <span class="docs-sous-titre">Les expressions</span>
+          <ul>
+            <li><a href="#">Affichage de variables</a></li>
+            <li><a href="#">Echappement d'expressions</a></li>
+            <li><a href="#">Commentaires</a></li>
+          </ul>
+          <br />
+          <span class="docs-sous-titre">Les blocs</span>
+          <ul>
+            <li><a href="templating/if">Conditions avec <span class="docs-code-instruction">if</span></a></li>
+            <li><a href="#">Boucles avec <span class="docs-code-instruction">foreach</span></a></li>
+          </ul>
+        </p>
+      </div>
+      <div class="docs-bloc-footer"></div>
+    </fieldset>
+  </body>
+</html>

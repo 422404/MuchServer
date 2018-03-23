@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Documentation MuchServer</title>
+    <link rel="stylesheet" href="/css/docs.css" />
+  </head>
+  
+  <body>
+    <fieldset class="docs-bloc">
+      <legend class="docs-bloc-titre">Introduction&nbsp;:</legend>
+      <div class="docs-bloc-body">
+        <p>
+          Bien le bonjour !
+          <br />
+          <br />
+          Bienvenue dans la doc la plus approximative jamais réalisée sur une appli 
+          tout autant approximative à ne jamais utiliser (ce qui rend cette doc inutile...).
+          <br />
+          <br />
+          Cette doc est elle-même construite avec le système de template de MuchServer.
+          <br />
+          Je te laisse donc te balader dans cette horrible documentation à la 
+          recherche de réponses à la question "mais comment marche ce truc inutile !?"
+        </p>
+      </div>
+      <div class="docs-bloc-footer"></div>
+    </fieldset>
+    
+    <fieldset class="docs-bloc">
+      <legend class="docs-bloc-titre">Docs&nbsp;:</legend>
+      <div class="docs-bloc-body">
+        <p>
+          <span class="docs-sous-titre">Composants</span>
+          <ul>
+            <li><a href="#">MuchServer... le serveur</a></li>
+            <li><a href="/templating">Système de templates</a></li>
+          </ul>
+        </p>
+      </div>
+      <div class="docs-bloc-footer"></div>
+    </fieldset>
+  </body>
+</html>

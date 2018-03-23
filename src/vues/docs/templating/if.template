@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>MuchServer - Système de template</title>
+    <link rel="stylesheet" href="/css/docs.css" />
+  </head>
+  
+  <body>
+    <fieldset class="docs-bloc">
+      <legend class="docs-bloc-titre">Conditions avec if&nbsp;:</legend>
+      <div class="docs-bloc-body">
+        <p>
+          L'instruction <span class="docs-code-instruction">if</span> permet
+          d'afficher conditionnellement une partie de page.
+          <br />
+          <br />
+          <code class="docs-code">
+            TODO - écrire le code
+          </code>
+        </p>
+      </div>
+      <div class="docs-bloc-footer"></div>
+    </fieldset>
+  </body>
+</html>

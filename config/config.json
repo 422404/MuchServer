@@ -1,0 +1,7 @@
+{
+    "port"  : 8080,
+    "debug" : true,
+    "pages_erreurs" : {
+        "404" : "/err/404.html"
+    }
+}

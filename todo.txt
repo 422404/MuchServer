@@ -1,0 +1,18 @@
+﻿- sécuriser l'appel de resources statiques !!!
+  --> "../src/controleurs/Index.js" INTERDIT
+  
+  ==> compter les entrées dans un dossier (ex: "/un/deux/trois" -> trois dossiers parcourus)
+      et les sorties d'un dossier (ex: "/un/../deux" -> deux dossiers parcourus avec une sortie)
+      
+      ! nbSorties <= nbEntrees !
+
+- implémenter console de debug quand flag debug activé dans config.json
+
+- documenter
+
+- système de cache pour | les contrôleurs
+                        | les templates compilées
+
+- refonte du compilateur : en cours
+
+- supprimer MoteurTemplate.js à terme
