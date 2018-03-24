@@ -99,7 +99,7 @@ class Template {
     /**
      * Compile la template en une fonction si elle n'a pas déjà été compilée
      * sinon renvoie juste sa référence
-     * @result fonction compilée de la template si aucune erreur
+     * @return fonction compilée de la template si aucune erreur
      * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     compiler() {
@@ -107,6 +107,10 @@ class Template {
         let finExpr;
         let expression;
         let typeEtendu;
+		
+		if (this.fonctionCompilee) return this.fonctionCompilee;
+		
+		// TODO ajouter methode pour obtenir le type d'expression actuel et non futur
         
         while (true) {
             this.debut = this.fin;
@@ -116,15 +120,15 @@ class Template {
             if (typeExpr == null) break;
             
             // on push le texte precèdent l'expression si elle n'est pas en première position
-            if (this.debut !== this.texteTemplate.length)
-                pushFIFO(this.texteTemplate.substr(0, this.debut), typeExpression.TEXTE);
+            if (this.debut !== this.fin)
+                pushFIFO(this.texteTemplate.substr(this.debut, this.fin + 1), typeExpression.TEXTE);
             
             // on cherche la fin de l'expression
-            finExper = this.prochaineFinExpression(typeExpr);
-            if (finExpr === false) 
-                throw new ExceptionCompilation(
-                    'Expression non fermée (char: ' + this.debut + ')'
-                );
+            // finExper = this.prochaineFinExpression(typeExpr);
+            // if (finExpr === false) 
+                // throw new ExceptionCompilation(
+                    // 'Expression non fermée (char: ' + this.debut + ')'
+                // );
             
             expression = this.texteTemplate.substring(this.debut, this.fin + 1);
             typEtendu = getTypeEtendu(expression);
@@ -172,7 +176,7 @@ class Template {
     
     /**
      * Crée la fonction compilée finale
-     * @result objet Function de la fonction compilée
+     * @return objet Function de la fonction compilée
      */
     creerFonction() {
         

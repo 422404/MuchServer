@@ -1,0 +1,16 @@
+<p>salut</p>[[ var ]]<i></i>
+
+[
+	{
+		texte: "<p>salut</p>",
+		type: "texte"
+	},
+	{
+		texte: "[[ var ]]",
+		type: "var"
+	},
+	{
+		texte: "<i></i>",
+		type: "texte"
+	}
+]
