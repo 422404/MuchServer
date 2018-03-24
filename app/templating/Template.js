@@ -32,15 +32,14 @@ const REGEX_BLOC_FOREACH = /^\[% *foreach +[a-zA-Z_$][0-9a-zA-Z_$]* +in +([a-zA-
 const REGEX_BLOC_ENDFOREACH = /^\[% *endforeach *%\]$/;
 
 const typeExpression = {
-    TEXTE      : 0, // n'est pas compilé, reste intact
+    TEXTE      : 0,
     VAR        : 1,
     COM        : 2, // n'est tout simplement pas pushé dans la FIFO
-    ECHAP      : 3, // n'est tout simplement pas pushé dans la FIFO
+    ECHAP      : 3,
     IF         : 4,
     ENDIF      : 5,
     FOREACH    : 6,
-    ENDFOREACH : 7,
-    BLOC       : 8  // général
+    ENDFOREACH : 7
 };
 
 /**
@@ -103,48 +102,13 @@ class Template {
      * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     compiler() {
-        let typeExpr;
-        let finExpr;
-        let expression;
-        let typeEtendu;
-		
-		if (this.fonctionCompilee) return this.fonctionCompilee;
-		
-		// TODO ajouter methode pour obtenir le type d'expression actuel et non futur
+        if (this.fonctionCompilee) return this.fonctionCompilee;
         
         while (true) {
             this.debut = this.fin;
             
-            // on boucle à la recherche de début d'expression potentielle
-            typeExpr = this.prochaineExpression();
-            if (typeExpr == null) break;
             
-            // on push le texte precèdent l'expression si elle n'est pas en première position
-            if (this.debut !== this.fin)
-                pushFIFO(this.texteTemplate.substr(this.debut, this.fin + 1), typeExpression.TEXTE);
-            
-            // on cherche la fin de l'expression
-            // finExper = this.prochaineFinExpression(typeExpr);
-            // if (finExpr === false) 
-                // throw new ExceptionCompilation(
-                    // 'Expression non fermée (char: ' + this.debut + ')'
-                // );
-            
-            expression = this.texteTemplate.substring(this.debut, this.fin + 1);
-            typEtendu = getTypeEtendu(expression);
-            if (typeEtendu === null)
-                throw new ExceptionCompilation(
-                    'Expression inconnue (char: ' + this.debut + ')'
-                );
-            
-            pushFIFO(expression, typeEtendu);
         }
-        
-        console.log(this.fifoElements);
-        
-        // compilation de toutes les expressions dans la FIFO
-        
-        // Réassemblage et renvoi de la fonction
     }
     
     /**
@@ -153,15 +117,12 @@ class Template {
      * @param type type de l'élément (voir enum typeExpression)
      */
     pushFIFO(elementTexte, type) {
-        
     }
     
     /**
-     * Compile les éléments de la FIFO qui ont besoin de l'être
-     * N'apporte aucune modification aux autres
+     * Compile les éléments de la FIFO 
      */
     compilerElementsFIFO() {
-        
     }
     
     /**
@@ -171,7 +132,6 @@ class Template {
      * des identificateurs utilisés en arguments de la fonction compilée
      */
     ajouterIdentificateur(identificateur) {
-        
     }
     
     /**
@@ -179,40 +139,36 @@ class Template {
      * @return objet Function de la fonction compilée
      */
     creerFonction() {
-        
     }
     
     /**
-     * Positionne l'indice de fin au début de la prochaine expression
+     * Positionne les indices autours de la prochaine experession
      * @return typeExpression si une expression est trouvée sinon null
-     * @todo finir le code
      */
     prochaineExpression() {
-        let matchIndice = this.texteTemplate.indexOf(DELIM_VAR[0], this.debut);
-        if (matchIndice !== -1) {
-            this.fin = matchIndice;
-            return typeExpression.VAR;
+        // plus de caractères
+        if (this.debut === this.texteTemplate.length) {
+            return null;
         }
         
-        matchIndice = this.texteTemplate.indexOf(DELIM_BLOC[0], this.debut);
-        if (matchIndice !== -1) {
-            this.fin = matchIndice;
-            return typeExpression.BLOC;
+        let debutExpr = this.texteTemplate.substr(this.debut, 2);
+        
+        // il ne reste que 1 caractère
+        if (debutExpr.length === 1) {
+            this.fin++;
+            return typeExpression.TEXTE;
         }
         
-        matchIndice = this.texteTemplate.indexOf(DELIM_COM[0], this.debut);
-        if (matchIndice !== -1) {
-            this.fin = matchIndice;
-            return typeExpression.COM;
+        let finExpr = null;
+        
+        switch (debutExpr) {
+            case DELIM_VAR[0] :
+            case DELIM_COM[0] :
+            case DELIM_ECHAP[0] :
+            case DELIM_BLOC[0] :
         }
         
-        matchIndice = this.texteTemplate.indexOf(DELIM_ECHAP[0], this.debut);
-        if (matchIndice !== -1) {
-            this.fin = matchIndice;
-            return typeExpression.ECHAP;
-        }
-        
-        return null;
+        return null; //stub
     }
     
     /**
@@ -222,43 +178,15 @@ class Template {
      * false
      */
     prochaineFinExpression(type) {
-        let match;
-        
-        switch (type) {
-            case typeElement.VAR:
-                match = DELIM_VAR[1];
-                break;
-            
-            case typeElement.COM:
-                match = DELIM_COM[1];
-                break;
-            
-            case typeElement.BLOC:
-                match = DELIM_BLOC[1];
-                break;
-            
-            case typeElement.ECHAP:
-                match = DELIM_ECHAP[1];
-                break;
-            
-            default:
-                return false;
-        }
-        
-        let indiceFinExpr = this.texteTemplate.indexOf(match, this.fin);
-        if (indiceFinExpr == -1) return false;
-        
-        this.fin = indiceFinExpr;
-        
-        return true;
     }
     
     /**
-     * Donne le type étendu d'un bloc
-     * @param expression
-     * @return typeExpression si match sinon null
+     * Donne le type de l'expression courante
+     * @return typeExpression si match sinon typeExpression.TEXTE
      */
-    getTypeEtendu(expression) {
+    getType() {
+        let expression = this.texteTemplate.substring(this.debut, this.fin);
+        
         if (REGEX_VAR.test(expression)) return typeElement.VAR;
         if (REGEX_COM.test(expression)) return typeElement.COM;
         if (REGEX_ECHAP.test(expression)) return typeElement.ECHAP;
@@ -267,7 +195,7 @@ class Template {
         if (REGEX_BLOC_FOREACH.test(expression)) return typeElement.BLOC_FOREACH;
         if (REGEX_BLOC_ENDFOREACH.test(expression)) return typeElement.BLOC_ENDFOREACH;
         
-        return null
+        return typeElement.TEXTE;
     }
 }
 
