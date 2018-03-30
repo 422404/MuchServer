@@ -1,0 +1,48 @@
+Affichage variable : [[ variable ]]
+--------------------
+
+if (typeof variable === 'undefined')
+    throw ExceptionInvocation('Variable "variable" non définie.');
+__res += variable;
+
+
+If : [% if variable == true || variable2 === null %] ... [% endif %]
+----
+
+if (typeof variable === 'undefined')
+    throw ExceptionInvocation('Variable "variable" non définie.');
+if (typeof variable2 === 'undefined')
+    throw ExceptionInvocation('Variable "variable2" non définie.');
+if (variable == true || variable2 === null) {
+    ...
+}
+
+
+Foreach : [% for item in liste %] ... [% endforeach %]
+---------                  OU
+          [% for i in 0..10 %] ... [% endforeach %]
+                           OU
+          [% for i in 10..0 %] ... [% endforeach %]
+
+if (typeof liste === 'undefined')
+    throw ExceptionInvocation('Variable "liste" non définie.');
+for (item of liste) {
+    ...
+}
+              OU
+for (let i = 0; i <= 10; i++) {
+    ...
+}
+              OU
+for (let i = 10; i >= 0; i--) {
+    ...
+}
+
+
+Commentaire : pas compilé
+-------------
+
+Echappement de code : [! [[ variable ]] !]
+---------------------
+
+__res += '[[ variable ]]';

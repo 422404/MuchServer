@@ -9,7 +9,8 @@ class Controleur {
         let cheminTemplate = Path.join(__dirname, '../src/vues/', path);
         
         let template = MoteurTemplate.getTemplate(cheminTemplate);
-        let templateCompilee = template.compiler();
+        template.compiler();
+        let templateCompilee =  template.creerFonction();
       
         if (typeof params !== 'undefined')
             html = templateCompilee(...params);

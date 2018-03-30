@@ -1,7 +1,5 @@
 <p>salut</p>[[ var ]]<i></i>
 
-Compile en :
-
 [
 	{
 		texte: "<p>salut</p>",

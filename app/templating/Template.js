@@ -52,42 +52,41 @@ class Template {
      * @param pathTemplate chemin vers le fichier template à lire
      */
     constructor(pathTemplate) {
-        /*
+        /**
          * Chemin vers la template
          */
         this.path = pathTemplate;
         
-        /*
+        /**
          * Texte de la template
          */
         this.texteTemplate = null;
         
-        /* Liste des identificateurs utilisés dans la template
+        /* *
+         * Liste des paramètres utilisés dans la template
          * Permet d'énumérer les arguments de la fonction résultant
          * de la compilation
-         * Permettra aussi d'ajouter des vérifications sur le reseignement
-         * ou non de certaines variables à l'invocation
          */
-        this.identificateurs = [];
+        this.parametres = [];
         
-        /*
+        /**
          * Pile FIFO (First In First Out) qui accueillera les éléments qui
          * constituront (après certaines modifications) les strings à
          * concaténer par la fonction compilée de la template
          */
         this.fifoElements = [];
         
-        /*
+        /**
          * Indice de début de bloc
          */
         this.debut = 0;
         
-        /*
+        /**
          * Indice de fin de bloc
          */
         this.fin = 0;
         
-        /*
+        /**
          * Fonction compilée finale
          */
         this.fonctionCompilee = null;
@@ -99,14 +98,11 @@ class Template {
     }
     
     /**
-     * Compile la template en une fonction si elle n'a pas déjà été compilée
-     * sinon renvoie juste sa référence
+     * Compile la template en une fonction
      * @return fonction compilée de la template si aucune erreur
      * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     compiler() {
-        if (this.fonctionCompilee) return this.fonctionCompilee;
-        
         while (true) {
             if (!this.prochaineExpression()) break;
             
@@ -140,25 +136,50 @@ class Template {
     }
     
     /**
-     * Compile les éléments de la FIFO 
+     * Compile les éléments de la FIFO et renvoie le code compilé
+     * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     compilerElementsFIFO() {
+        return '';
     }
     
     /**
-     * Ajoute un identificateur à la liste des identificateurs si il ne s'y
-     * trouve pas déjà
-     * @param identificateur nom de l'identificateur à rajouter à la liste
-     * des identificateurs utilisés en arguments de la fonction compilée
+     * Construit une vérification de l'existance des paramètres de la fonction
+     * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
-    ajouterIdentificateur(identificateur) {
+    compilerVerifParams() {
+        return '';
     }
     
     /**
-     * Crée la fonction compilée finale
+     * Ajoute un paramètre à la liste des paramètres si il ne s'y
+     * trouve pas déjà
+     * @param parametre nom du paramètre à rajouter à la liste
+     * des paramètres de la fonction compilée
+     */
+    ajouterParametre(parametre) {
+    }
+    
+    /**
+     * Crée la fonction compilée finale si elle n'a pas déjà été compilée
+     * sinon renvoie juste sa référence
      * @return objet Function de la fonction compilée
+     * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     creerFonction() {
+        if (this.fonctionCompilee) return this.fonctionCompilee;
+        this.compiler();
+        
+        // le nom d'identificateur __res est réservé
+        const variableRes = 'let __res = "hello";';
+        const retourRes = 'return __res;';
+        
+        return new Function(...this.parametres,
+            variableRes
+            + this.compilerVerifParams() 
+            + this.compilerElementsFIFO() 
+            + retourRes
+        );
     }
     
     /**
