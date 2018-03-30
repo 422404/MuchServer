@@ -1,0 +1,25 @@
+Expressions :
+
+Affichage variable :
+    [[ variable ]]
+
+If :
+    [% if a == b %]
+        ...
+    [% endif %]
+
+Foreach :
+    [% foreach item in liste %]
+        ...
+    [% endforeach %]
+    
+            OU
+    [% foreach i in 0..10 %]
+        ...
+    [% endforeach %]
+
+Commentaire :
+    [# commentaire #]
+
+Echappement de code :
+    [! tel quel -> [[ var ]] [# quand même affiché ! #] !]

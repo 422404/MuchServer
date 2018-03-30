@@ -92,7 +92,13 @@ class Template {
          */
         this.fonctionCompilee = null;
         
-        this.texteTemplate = Fs.readFileSync(pathTemplate, 'utf-8');
+        /**
+         * Texte de la template
+         */
+        this.texteTemplate = Fs.readFileSync(
+            Path.join('../../src/vues/', pathTemplate),
+            'utf-8'
+        );
     }
     
     /**
@@ -105,10 +111,21 @@ class Template {
         if (this.fonctionCompilee) return this.fonctionCompilee;
         
         while (true) {
+            if (!this.prochaineExpression()) break;
+            
+            let type = this.getType();
+            console.log('Expression trouvée | type : ' + type);
+            if (type !== typeExpression.COM) {
+                this.pushFIFO(
+                    this.texteTemplate.substring(this.debut, this.fin),
+                    type
+                );
+            }
             this.debut = this.fin;
-            
-            
         }
+        
+        console.log();
+        console.log(this.fifoElements);
     }
     
     /**
@@ -117,6 +134,12 @@ class Template {
      * @param type type de l'élément (voir enum typeExpression)
      */
     pushFIFO(elementTexte, type) {
+        this.fifoElements.push(
+            {
+                texte: elementTexte,
+                type : type
+            }
+        );
     }
     
     /**
@@ -143,41 +166,96 @@ class Template {
     
     /**
      * Positionne les indices autours de la prochaine experession
-     * @return typeExpression si une expression est trouvée sinon null
+     * @return retourne true quand une expression a été détectée
+     * @throws ExceptionCompilation
      */
     prochaineExpression() {
         // plus de caractères
         if (this.debut === this.texteTemplate.length) {
-            return null;
+            return false;
         }
         
+        let type = null;
         let debutExpr = this.texteTemplate.substr(this.debut, 2);
         
         // il ne reste que 1 caractère
         if (debutExpr.length === 1) {
-            this.fin++;
-            return typeExpression.TEXTE;
+            this.fin++; // = this.texteTemplate.length
+            return true;
         }
         
         let finExpr = null;
         
         switch (debutExpr) {
             case DELIM_VAR[0] :
+                finExpr = DELIM_VAR[1];
+                type = 'var';
+                break;
+                
             case DELIM_COM[0] :
+                finExpr = DELIM_COM[1];
+                type = 'com';
+                break;
+                
             case DELIM_ECHAP[0] :
+                finExpr = DELIM_ECHAP[1];
+                type = 'echap';
+                break;
+                
             case DELIM_BLOC[0] :
+                finExpr = DELIM_BLOC[1];
+                type = 'bloc';
+                break;
+            
+            default:
+                type = 'texte';
         }
         
-        return null; //stub
+        // on cherche le début de la prochaine expression pour connaitre la fin
+        // du texte
+        if (type === 'texte') {
+            let offset = this.debut;
+            // tant que l'on ne trouve pas l'ouverture d'une prochaine expression
+            // on boucle
+            while (offset != this.texteTemplate.length) {
+                let candidat = this.texteTemplate.indexOf('[', offset);
+                if (candidat === -1) {
+                    break;
+                }
+                
+                let debutAutreExpr = this.texteTemplate.substr(candidat, 2);
+                if (debutAutreExpr === DELIM_VAR[0]
+                        || debutAutreExpr === DELIM_BLOC[0]
+                        || debutAutreExpr === DELIM_COM[0]
+                        || debutAutreExpr === DELIM_ECHAP[0]) {
+                    this.fin = candidat;
+                    return true;
+                }
+                
+                offset = candidat + 1;
+            }
+            
+            this.fin = this.texteTemplate.length;
+            return true;
+        }
+        
+        let indiceFinExpr = this.texteTemplate.indexOf(finExpr, this.debut);
+        if (indiceFinExpr === -1) { // l'expression n'a pas de fermeture
+            throw new ExceptionCompilation(
+                "L'expression à l'indice ${this.debut} est malformé.\n" 
+                + "Il manque la fermeture de la balise: '" + finExper + "'."
+            );
+        }
+        this.fin = indiceFinExpr + 2; // on veut pointer après l'expression
+        
+        return true;
     }
     
     /**
-     * Positionne l'indice de fin au début de la prochaine expression
-     * @param type type de fin d'expression à trouver
-     * @return true si l'indice a été positionné en début d'expression sinon
-     * false
+     * Vérifie qu'il y ait le même nombre d'ouvertures de blocs que de fermetures
+     * @return true si tout va bien sinon false
      */
-    prochaineFinExpression(type) {
+    nbBlocsOuvertsEgalNbBlocsFermes() {
     }
     
     /**
@@ -187,15 +265,15 @@ class Template {
     getType() {
         let expression = this.texteTemplate.substring(this.debut, this.fin);
         
-        if (REGEX_VAR.test(expression)) return typeElement.VAR;
-        if (REGEX_COM.test(expression)) return typeElement.COM;
-        if (REGEX_ECHAP.test(expression)) return typeElement.ECHAP;
-        if (REGEX_BLOC_IF.test(expression)) return typeElement.IF;
-        if (REGEX_BLOC_ENDIF.test(expression)) return typeElement.BLOC_ENDIF;
-        if (REGEX_BLOC_FOREACH.test(expression)) return typeElement.BLOC_FOREACH;
-        if (REGEX_BLOC_ENDFOREACH.test(expression)) return typeElement.BLOC_ENDFOREACH;
+        if (REGEX_VAR.test(expression)) return typeExpression.VAR;
+        if (REGEX_COM.test(expression)) return typeExpression.COM;
+        if (REGEX_ECHAP.test(expression)) return typeExpression.ECHAP;
+        if (REGEX_BLOC_IF.test(expression)) return typeExpression.IF;
+        if (REGEX_BLOC_ENDIF.test(expression)) return typeExpression.ENDIF;
+        if (REGEX_BLOC_FOREACH.test(expression)) return typeExpression.FOREACH;
+        if (REGEX_BLOC_ENDFOREACH.test(expression)) return typeExpression.ENDFOREACH;
         
-        return typeElement.TEXTE;
+        return typeExpression.TEXTE;
     }
 }
 

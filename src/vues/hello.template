@@ -1,0 +1,1 @@
+abcd[[ var ]] [! raw !][% if a == c %]dcb[a[% endif %] [# commentaire #] 

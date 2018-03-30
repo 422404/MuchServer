@@ -1,0 +1,17 @@
+Récolte des identificateurs :
+On peut trouver des identificateurs dans :
+    - affichage de variable
+    - boucle foreach
+    - if
+
+
+Dans affichage variable :
+    [[ identificateur ]]
+
+Dans foreach : 
+    [% foreach identificateur1 in identificateur2 %]
+                          OU
+          [% foreach identificateur1 in 0..1 %]
+
+Dans if : 
+    [% if identificateur1 == true || identificateur2 != identificateur3 %]
