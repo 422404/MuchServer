@@ -95,10 +95,7 @@ class Template {
         /**
          * Texte de la template
          */
-        this.texteTemplate = Fs.readFileSync(
-            Path.join('../../src/vues/', pathTemplate),
-            'utf-8'
-        );
+        this.texteTemplate = Fs.readFileSync(pathTemplate, 'utf-8');
     }
     
     /**

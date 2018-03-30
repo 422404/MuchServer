@@ -1,16 +1,18 @@
 <p>salut</p>[[ var ]]<i></i>
 
+Compile en :
+
 [
 	{
 		texte: "<p>salut</p>",
-		type: "texte"
+		type: 0
 	},
 	{
 		texte: "[[ var ]]",
-		type: "var"
+		type: 1
 	},
 	{
 		texte: "<i></i>",
-		type: "texte"
+		type: 0
 	}
 ]

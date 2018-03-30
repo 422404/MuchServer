@@ -8,20 +8,14 @@ class Controleur {
         let html;
         let cheminTemplate = Path.join(__dirname, '../src/vues/', path);
         
-        try {
-          let template = MoteurTemplate.getTemplate(cheminTemplate);
-          let templateCompilee = template.compiler();
-          
-          if (typeof params !== 'undefined')
-              html = templateCompilee(...params);
-          else
-              html = templateCompilee();
-          reponse.end(html);
-        } catch (e) {
-            console.log(e);
-            reponse.writeHead(404);
-            reponse.end();
-        }
+        let template = MoteurTemplate.getTemplate(cheminTemplate);
+        let templateCompilee = template.compiler();
+      
+        if (typeof params !== 'undefined')
+            html = templateCompilee(...params);
+        else
+            html = templateCompilee();
+        reponse.end(html);
     }
 }
 
