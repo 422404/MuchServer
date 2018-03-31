@@ -62,13 +62,6 @@ class Template {
          */
         this.texteTemplate = null;
         
-        /* *
-         * Liste des paramètres utilisés dans la template
-         * Permet d'énumérer les arguments de la fonction résultant
-         * de la compilation
-         */
-        this.parametres = [];
-        
         /**
          * Pile FIFO (First In First Out) qui accueillera les éléments qui
          * constituront (après certaines modifications) les strings à
@@ -155,32 +148,20 @@ class Template {
                 case typeExpression.VAR:
                     code += this.compilerVar(e.texte);
                     break;
+                
+                case typeExpression.IF:
+                    code += this.compilerIf(e.texte);
+                    break;
+                
+                case typeExpression.ENDIF:
+                // case typeExpression.ENDFOREACH:
+                    code += ' } ';
+                    break;
             }
         }
         
         return code;
     }
-    
-    /**
-     * Construit une vérification de l'existance des paramètres de la fonction
-     * @throws ExeptionCompilation si une erreur est levée lors de la compilation
-     */
-    /*compilerVerifParams() {
-        return '';
-    }*/
-    
-    /**
-     * Ajoute un paramètre à la liste des paramètres si il ne s'y
-     * trouve pas déjà
-     * @param parametre nom du paramètre à rajouter à la liste
-     * des paramètres de la fonction compilée
-     */
-    /*ajouterParametre(parametre) {
-        for (let p of this.parametres) {
-            if (p === parametre) return;
-        }
-        this.parametres.push(parametre);
-    }*/
     
     /**
      * Crée la fonction compilée finale si elle n'a pas déjà été compilée
@@ -194,17 +175,16 @@ class Template {
         
         // le nom d'identificateur __res est réservé
         const variableRes = 'let __res = "";';
+        const verifParams = 'if (typeof params === \'undefined\') params = {};';
         const retourRes = 'return __res;';
-        // const verifParams = this.compilerVerifParams();
         const code = this.compilerElementsFIFO();
         
         console.log();
-        // console.log(this.parametres);
         console.log(code);
         return this.fonctionCompilee = new Function(
             'params',
             variableRes
-            // + verifParams
+            + verifParams
             + code
             + retourRes
         );
@@ -288,7 +268,7 @@ class Template {
         let indiceFinExpr = this.texteTemplate.indexOf(finExpr, this.debut);
         if (indiceFinExpr === -1) { // l'expression n'a pas de fermeture
             throw new ExceptionCompilation(
-                "L'expression à l'indice ${this.debut} est malformé.\n" 
+                "L'expression à l'indice " + this.debut + " est malformé.\n" 
                 + "Il manque la fermeture de la balise: '" + finExper + "'."
             );
         }
@@ -331,9 +311,7 @@ class Template {
         let nomVar = 'params.' + exp.substring(2, exp.length - 2).trim();
         // this.ajouterParametre(nomVar);
         
-        return 'if (typeof ' + nomVar + ' === \'undefined\')'
-               + 'throw \'Variable "' + nomVar + '" non définie.\';'
-               + '__res += ' + nomVar + ';';
+        return codeVerif(nomVar) + '__res += ' + nomVar + ';';
     }
     
     /**
@@ -341,18 +319,12 @@ class Template {
      * @param exp expression à compiler
      */
     compilerEchap(exp) {
-        return '__res += "' + exp
-               // on retire les ouvertures et fermetures d'expressions
-               .substring(2, exp.length - 2)
-               .trim()
-               // on échappe les guillemets et accolades
-               .replace(/'/g, "\\\'")
-               .replace(/"/g, "\\\"")
-               // on échappe les \n, \r, et \t
-               .replace(/\n/g, "\\n")
-               .replace(/\r/g, "\\r")
-               .replace(/\t/g, "\\t")
-               + '";';
+        return '__res += "' + echap(
+                    exp
+                    // on retire les ouvertures et fermetures d'expressions
+                    .substring(2, exp.length - 2)
+                    .trim()
+                ) + '";';
     }
     
     /**
@@ -360,15 +332,7 @@ class Template {
      * @param exp expression à compiler
      */
     compilerTexte(exp) {
-        return '__res += "' + exp
-               // on échappe les guillemets et accolades
-               .replace(/'/g, "\\\'")
-               .replace(/"/g, "\\\"")
-               // on échappe les \n, \r, et \t
-               .replace(/\n/g, "\\n")
-               .replace(/\r/g, "\\r")
-               .replace(/\t/g, "\\t")
-               + '";';
+        return '__res += "' + echap(exp) + '";';
     }
     
     /**
@@ -376,10 +340,72 @@ class Template {
      * @param exp expression à compiler
      */
     compilerIf(exp) {
+        let code = '';
+        
         // permet de valider et récupérer les conditions du if
-        const COND_REGEX = /(((typeof *|instanceof *)?[a-zA-Z_$][0-9a-zA-Z_$]* *(==|===|!=|!==|<|>|<=|>=|in) *([a-zA-Z_$][0-9a-zA-Z_$]*|\"[^\"]*\"|\'[^\']*\') *(&&|\|\|)? *)+)/;
-        return '';
+        const COND_REGEX = /(((typeof *|instanceof *)?[a-zA-Z_$][0-9a-zA-Z_$]* *(===|==|!==|!=|<=|>=|<|>|in) *([a-zA-Z_$][0-9a-zA-Z_$]*|\"[^\"]*\"|\'[^\']*\') *(&&|\|\|)? *)+)/;
+        
+        let conditionsArray = exp.match(COND_REGEX);
+        if (conditionsArray === null)
+            throw ExceptionCompilation('Une ou plusieurs condition d\'un if sont invalides.');
+        
+        let conditions = conditionsArray[0];
+        
+        /* tout identificateur qui n'est pas un mot reservé pour les conditions
+         * est prefixé avec le nom de  l'objet qui passe les paramètres 'params.'
+         * Mot réservés : typeof, instanceof, true, false, null
+         */
+        // on récupère les left values et les right values des conditions
+        let tmp = conditions.split(/(&&|\|\||===|==|!==|!=|<=|>=|<|>)/g);
+        let identificateursNonUniques = [];
+        let conditionsModifies = '';
+        console.log(tmp);
+        
+        for (let c of tmp) { // on récupère les identificateurs
+            c = c.trim();
+            if (!/(&&|\|\||===|==|!==|!=|<=|>=|<|>|instanceof|typeof|true|false|null)/g.test(c)
+                    && c[0] !== '\'' && c[0] !== '"') {
+                identificateursNonUniques.push(c);
+                conditionsModifies += 'params.' + c;
+            } else {
+                conditionsModifies += c;
+            }
+        }
+        
+        // on enlève les doublons
+        let identificateurs = new Set(identificateursNonUniques);
+        // on ajoute les vérifications de l'existance des variables
+        for (let i of identificateurs) {
+            let nomVar = 'params.' + i;
+            code += codeVerif(nomVar);
+        }
+        
+        return code + 'if (' + conditionsModifies + ') { ';
     }
+}
+
+/**
+ * Revoie le code de vérification de la définition d'une variable
+ * @param nomVar nom de la variable
+ */
+function codeVerif(nomVar) {
+    return 'if (typeof ' + nomVar + ' === \'undefined\') '
+            + 'throw \'Variable "' + nomVar + '" non définie.\';'
+}
+
+/**
+ * Echappe les accolades, guillemets, \n, \r et \t
+ * @param texte texte à échapper
+ */
+function echap(texte) {
+    return texte
+            // on échappe les guillemets et accolades
+            .replace(/'/g, "\\\'")
+            .replace(/"/g, "\\\"")
+            // on échappe les \n, \r, et \t
+            .replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r")
+            .replace(/\t/g, "\\t");
 }
 
 module.exports = Template;

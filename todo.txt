@@ -1,8 +1,11 @@
 ﻿- implémenter console de debug quand flag debug activé dans config.json
 
-- documenter
+- documentation
 
 - système de cache pour | les contrôleurs
                         | les templates compilées
 
 - refonte du compilateur : en cours
+
+- rajouter un numéro de ligne, de caractère sur la ligne et un nom de fichier dans une exception de compilation
+    --> permettra l'affichage de la portion de template posant problème
