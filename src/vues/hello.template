@@ -1,1 +1,3 @@
-abcd[[ var ]] [! raw !][% if a == c %]dcb[a[% endif %] [# commentaire #] 
+"ab'c'd[[ variable ]] [! raw !]
+[% if a == c %]dcb[a[% endif %]
+[# commentaire #]    '  

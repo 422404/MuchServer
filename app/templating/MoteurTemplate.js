@@ -7,7 +7,8 @@ class MoteurTemplate {
     }
     
     static compiler(template) {
-        return template.compiler();
+        template.compiler();
+        return template.creerFonction();
     }
 }
 

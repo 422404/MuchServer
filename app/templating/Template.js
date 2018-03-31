@@ -140,16 +140,63 @@ class Template {
      * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
     compilerElementsFIFO() {
-        return '';
+        let code = "";
+        
+        for (let e of this.fifoElements) {
+            switch (e.type) {
+                case typeExpression.TEXTE:
+                    code += '__res += "' 
+                            + e.texte
+                                // on échappe les guillemets et accolades
+                                .replace(/'/g, "\\\'")
+                                .replace(/"/g, "\\\"")
+                                // on échappe les \n, \r, et \t
+                                .replace(/\n/g, "\\n")
+                                .replace(/\r/g, "\\r")
+                                .replace(/\t/g, "\\t")
+                            + '";';
+                    break;
+                
+                case typeExpression.ECHAP:
+                    code += '__res += "'
+                            + e.texte
+                                // on retire les ouvertures et fermetures d'expressions
+                                .substring(2, e.texte.length - 2)
+                                .trim()
+                                // on échappe les guillemets et accolades
+                                .replace(/'/g, "\\\'")
+                                .replace(/"/g, "\\\"")
+                                // on échappe les \n, \r, et \t
+                                .replace(/\n/g, "\\n")
+                                .replace(/\r/g, "\\r")
+                                .replace(/\t/g, "\\t")
+                            + '";';
+                    break;
+                
+                case typeExpression.VAR:
+                    let nomVar = 'params.' 
+                                 + e.texte
+                                       // on retire les ouvertures et fermetures d'expressions
+                                       .substring(2, e.texte.length - 2)
+                                       .trim();
+                    // this.ajouterParametre(nomVar);
+                    code += 'if (typeof ' + nomVar + ' === \'undefined\')'
+                            + 'throw \'Variable "' + nomVar + '" non définie.\';'
+                            + '__res += ' + nomVar + ';';
+                    break;
+            }
+        }
+        
+        return code;
     }
     
     /**
      * Construit une vérification de l'existance des paramètres de la fonction
      * @throws ExeptionCompilation si une erreur est levée lors de la compilation
      */
-    compilerVerifParams() {
+    /*compilerVerifParams() {
         return '';
-    }
+    }*/
     
     /**
      * Ajoute un paramètre à la liste des paramètres si il ne s'y
@@ -157,8 +204,12 @@ class Template {
      * @param parametre nom du paramètre à rajouter à la liste
      * des paramètres de la fonction compilée
      */
-    ajouterParametre(parametre) {
-    }
+    /*ajouterParametre(parametre) {
+        for (let p of this.parametres) {
+            if (p === parametre) return;
+        }
+        this.parametres.push(parametre);
+    }*/
     
     /**
      * Crée la fonction compilée finale si elle n'a pas déjà été compilée
@@ -171,13 +222,19 @@ class Template {
         this.compiler();
         
         // le nom d'identificateur __res est réservé
-        const variableRes = 'let __res = "hello";';
+        const variableRes = 'let __res = "";';
         const retourRes = 'return __res;';
+        // const verifParams = this.compilerVerifParams();
+        const code = this.compilerElementsFIFO();
         
-        return new Function(...this.parametres,
+        console.log();
+        // console.log(this.parametres);
+        console.log(code);
+        return this.fonctionCompilee = new Function(
+            'params',
             variableRes
-            + this.compilerVerifParams() 
-            + this.compilerElementsFIFO() 
+            // + verifParams
+            + code
             + retourRes
         );
     }
