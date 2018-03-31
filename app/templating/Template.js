@@ -23,9 +23,9 @@ const DELIM_BLOC  = ['[%', '%]'];
 const DELIM_COM   = ['[#', '#]'];
 const DELIM_ECHAP = ['[!', '!]'];
 
-const REGEX_COM = /\[#.*#\]/;
-const REGEX_ECHAP = /\[!.*!\]/;
-const REGEX_VAR = /\[\[ *[a-zA-Z_$][0-9a-zA-Z_$]* *\]\]/;
+const REGEX_COM = /^\[#.*#\]$/;
+const REGEX_ECHAP = /^\[!.*!\]$/;
+const REGEX_VAR = /^\[\[ *[a-zA-Z_$][0-9a-zA-Z_$]* *\]\]$/;
 const REGEX_BLOC_IF = /^\[% *if +.+ *%\]$/;
 const REGEX_BLOC_ENDIF = /^\[% *endif *%\]$/;
 const REGEX_BLOC_FOREACH = /^\[% *foreach +[a-zA-Z_$][0-9a-zA-Z_$]* +in +([a-zA-Z_$][0-9a-zA-Z_$]*|[0-9]+\.\.[0-9]+) *%\]$/;
