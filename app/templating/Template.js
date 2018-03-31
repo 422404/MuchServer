@@ -145,44 +145,15 @@ class Template {
         for (let e of this.fifoElements) {
             switch (e.type) {
                 case typeExpression.TEXTE:
-                    code += '__res += "' 
-                            + e.texte
-                                // on échappe les guillemets et accolades
-                                .replace(/'/g, "\\\'")
-                                .replace(/"/g, "\\\"")
-                                // on échappe les \n, \r, et \t
-                                .replace(/\n/g, "\\n")
-                                .replace(/\r/g, "\\r")
-                                .replace(/\t/g, "\\t")
-                            + '";';
+                    code += this.compilerTexte(e.texte);
                     break;
                 
                 case typeExpression.ECHAP:
-                    code += '__res += "'
-                            + e.texte
-                                // on retire les ouvertures et fermetures d'expressions
-                                .substring(2, e.texte.length - 2)
-                                .trim()
-                                // on échappe les guillemets et accolades
-                                .replace(/'/g, "\\\'")
-                                .replace(/"/g, "\\\"")
-                                // on échappe les \n, \r, et \t
-                                .replace(/\n/g, "\\n")
-                                .replace(/\r/g, "\\r")
-                                .replace(/\t/g, "\\t")
-                            + '";';
+                    code += this.compilerEchap(e.texte);
                     break;
                 
                 case typeExpression.VAR:
-                    let nomVar = 'params.' 
-                                 + e.texte
-                                       // on retire les ouvertures et fermetures d'expressions
-                                       .substring(2, e.texte.length - 2)
-                                       .trim();
-                    // this.ajouterParametre(nomVar);
-                    code += 'if (typeof ' + nomVar + ' === \'undefined\')'
-                            + 'throw \'Variable "' + nomVar + '" non définie.\';'
-                            + '__res += ' + nomVar + ';';
+                    code += this.compilerVar(e.texte);
                     break;
             }
         }
@@ -349,6 +320,65 @@ class Template {
         if (REGEX_BLOC_ENDFOREACH.test(expression)) return typeExpression.ENDFOREACH;
         
         return typeExpression.TEXTE;
+    }
+    
+    /**
+     * Compile une expression d'affichage de variable
+     * @param exp expression à compiler
+     */
+    compilerVar(exp) {
+        // on retire les ouvertures et fermetures d'expressions
+        let nomVar = 'params.' + exp.substring(2, exp.length - 2).trim();
+        // this.ajouterParametre(nomVar);
+        
+        return 'if (typeof ' + nomVar + ' === \'undefined\')'
+               + 'throw \'Variable "' + nomVar + '" non définie.\';'
+               + '__res += ' + nomVar + ';';
+    }
+    
+    /**
+     * Compile une expression d'échappement
+     * @param exp expression à compiler
+     */
+    compilerEchap(exp) {
+        return '__res += "' + exp
+               // on retire les ouvertures et fermetures d'expressions
+               .substring(2, exp.length - 2)
+               .trim()
+               // on échappe les guillemets et accolades
+               .replace(/'/g, "\\\'")
+               .replace(/"/g, "\\\"")
+               // on échappe les \n, \r, et \t
+               .replace(/\n/g, "\\n")
+               .replace(/\r/g, "\\r")
+               .replace(/\t/g, "\\t")
+               + '";';
+    }
+    
+    /**
+     * Compile une expression texte
+     * @param exp expression à compiler
+     */
+    compilerTexte(exp) {
+        return '__res += "' + exp
+               // on échappe les guillemets et accolades
+               .replace(/'/g, "\\\'")
+               .replace(/"/g, "\\\"")
+               // on échappe les \n, \r, et \t
+               .replace(/\n/g, "\\n")
+               .replace(/\r/g, "\\r")
+               .replace(/\t/g, "\\t")
+               + '";';
+    }
+    
+    /**
+     * Compile une expression if
+     * @param exp expression à compiler
+     */
+    compilerIf(exp) {
+        // permet de valider et récupérer les conditions du if
+        const COND_REGEX = /(((typeof *|instanceof *)?[a-zA-Z_$][0-9a-zA-Z_$]* *(==|===|!=|!==|<|>|<=|>=|in) *([a-zA-Z_$][0-9a-zA-Z_$]*|\"[^\"]*\"|\'[^\']*\') *(&&|\|\|)? *)+)/;
+        return '';
     }
 }
 
