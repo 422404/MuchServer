@@ -152,9 +152,13 @@ class Template {
                 case typeExpression.IF:
                     code += this.compilerIf(e.texte);
                     break;
+                    
+                case typeExpression.FOREACH:
+                    code += this.compilerForeach(e.texte);
+                    break;
                 
                 case typeExpression.ENDIF:
-                // case typeExpression.ENDFOREACH:
+                case typeExpression.ENDFOREACH:
                     code += ' } ';
                     break;
             }
@@ -278,13 +282,6 @@ class Template {
     }
     
     /**
-     * Vérifie qu'il y ait le même nombre d'ouvertures de blocs que de fermetures
-     * @return true si tout va bien sinon false
-     */
-    nbBlocsOuvertsEgalNbBlocsFermes() {
-    }
-    
-    /**
      * Donne le type de l'expression courante
      * @return typeExpression si match sinon typeExpression.TEXTE
      */
@@ -308,10 +305,11 @@ class Template {
      */
     compilerVar(exp) {
         // on retire les ouvertures et fermetures d'expressions
-        let nomVar = 'params.' + exp.substring(2, exp.length - 2).trim();
-        // this.ajouterParametre(nomVar);
+        let nomVar = exp.substring(2, exp.length - 2).trim();
         
-        return codeVerif(nomVar) + '__res += ' + nomVar + ';';
+        return codeVerif(nomVar) + '__res += ' + 'typeof params.' 
+                + nomVar + ' !== \'undefined\' ? params.'+ nomVar 
+                + ' : ' + nomVar + ';';
     }
     
     /**
@@ -343,11 +341,11 @@ class Template {
         let code = '';
         
         // permet de valider et récupérer les conditions du if
-        const COND_REGEX = /(((typeof *|instanceof *)?[a-zA-Z_$][0-9a-zA-Z_$]* *(===|==|!==|!=|<=|>=|<|>|in) *([a-zA-Z_$][0-9a-zA-Z_$]*|\"[^\"]*\"|\'[^\']*\') *(&&|\|\|)? *)+)/;
+        const COND_REGEX = /(((typeof *|instanceof *)?[a-zA-Z_$][0-9a-zA-Z_$]* *(% *[0-9]+ *)?(===|==|!==|!=|<=|>=|<|>|in) *([a-zA-Z_$][0-9a-zA-Z_$]*|\"[^\"]*\"|\'[^\']*\'|[0-9]+) *(&&|\|\|)? *)+)/;
         
         let conditionsArray = exp.match(COND_REGEX);
         if (conditionsArray === null)
-            throw ExceptionCompilation('Une ou plusieurs condition d\'un if sont invalides.');
+            throw new ExceptionCompilation('Une ou plusieurs condition d\'un if sont invalides.');
         
         let conditions = conditionsArray[0];
         
@@ -356,15 +354,14 @@ class Template {
          * Mot réservés : typeof, instanceof, true, false, null
          */
         // on récupère les left values et les right values des conditions
-        let tmp = conditions.split(/(&&|\|\||===|==|!==|!=|<=|>=|<|>)/g);
+        let tmp = conditions.split(/(&&|\|\||===|==|!==|!=|<=|>=|<|>|%)/g);
         let identificateursNonUniques = [];
         let conditionsModifies = '';
-        console.log(tmp);
         
         for (let c of tmp) { // on récupère les identificateurs
             c = c.trim();
-            if (!/(&&|\|\||===|==|!==|!=|<=|>=|<|>|instanceof|typeof|true|false|null)/g.test(c)
-                    && c[0] !== '\'' && c[0] !== '"') {
+            if (!/(&&|\|\||===|==|!==|!=|<=|>=|<|>|%|instanceof|typeof|true|false|null)/g.test(c)
+                    && c[0] !== '\'' && c[0] !== '"' && !/[0-9]+/.test(c)) {
                 identificateursNonUniques.push(c);
                 conditionsModifies += 'params.' + c;
             } else {
@@ -376,11 +373,49 @@ class Template {
         let identificateurs = new Set(identificateursNonUniques);
         // on ajoute les vérifications de l'existance des variables
         for (let i of identificateurs) {
-            let nomVar = 'params.' + i;
-            code += codeVerif(nomVar);
+            code += codeVerif(i);
         }
         
         return code + 'if (' + conditionsModifies + ') { ';
+    }
+    
+    /**
+     * Compile une expression foreach
+     * @param exp expression à compiler
+     */
+    compilerForeach(exp) {
+        let code = '';
+        let tokens = exp.substring(exp.indexOf('for') + 3, exp.length - 2)
+                .trim().split(/ +/g);
+        
+        let nomItem = tokens[1]
+        let liste = tokens[3];
+        
+        if (/^[0-9]+\.\.[0-9]+$/.test(liste)) {
+            let bornes = liste.match(/[0-9]+/g);
+            bornes[0] = Number(bornes[0]);
+            bornes[1] = Number(bornes[1]);
+            let dec = bornes[0] > bornes[1]; // 0..2 on incrémente, 2..0 on décrémente
+            let tab = [];
+            
+            if (dec) {
+                for (let i = bornes[1]; i >= bornes[0]; i--)
+                    tab.push(i);
+            } else {
+                for (let i = bornes[0]; i <= bornes[1]; i++)
+                    tab.push(i);
+            }
+            
+            console.log(tab);
+            
+            // on sérialize le tableau
+            liste = JSON.stringify(tab);
+        } else {
+            code += codeVerif(liste);
+            liste = 'params.' + liste;
+        }
+        
+        return code + 'for (let ' + nomItem + ' of ' + liste + ') { ';
     }
 }
 
@@ -389,7 +424,8 @@ class Template {
  * @param nomVar nom de la variable
  */
 function codeVerif(nomVar) {
-    return 'if (typeof ' + nomVar + ' === \'undefined\') '
+    return 'if (typeof params.' + nomVar + ' === \'undefined\' '
+            + '&& typeof '+ nomVar + ' === \'undefined\') '
             + 'throw \'Variable "' + nomVar + '" non définie.\';'
 }
 
