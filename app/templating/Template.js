@@ -399,7 +399,7 @@ class Template {
             let tab = [];
             
             if (dec) {
-                for (let i = bornes[1]; i >= bornes[0]; i--)
+                for (let i = bornes[0]; i >= bornes[1]; i--)
                     tab.push(i);
             } else {
                 for (let i = bornes[0]; i <= bornes[1]; i++)
