@@ -9,3 +9,6 @@
 
 - rajouter un numéro de ligne, de caractère sur la ligne et un nom de fichier dans une exception de compilation
     --> permettra l'affichage de la portion de template posant problème
+
+- la compilation des échapements est foireuse, voir résultat --> http://localhost:8080/dev/10
+- revoir la suppression des retours à la ligne, voir pareil qu'au dessus

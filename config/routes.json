@@ -1,5 +1,6 @@
 [
     {"path" : "/" , "controleur" : "Index:index"},
     {"path" : "/templating" , "controleur" : "Index:templating"},
-    {"path" : "/templating/if" , "controleur" : "Index:if"}
+    {"path" : "/templating/if" , "controleur" : "Index:if"},
+    {"path" : "/dev/{nb}" , "controleur" : "Dev:index"}
 ]

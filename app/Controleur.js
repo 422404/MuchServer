@@ -12,10 +12,11 @@ class Controleur {
         template.compiler();
         let templateCompilee =  template.creerFonction();
       
-        if (typeof params !== 'undefined')
+        if (typeof params !== 'undefined') {
             html = templateCompilee(params);
-        else
+        } else {
             html = templateCompilee();
+        }
         reponse.end(html);
     }
 }

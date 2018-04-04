@@ -438,10 +438,10 @@ function echap(texte) {
             // on échappe les guillemets et accolades
             .replace(/'/g, "\\\'")
             .replace(/"/g, "\\\"")
-            // on échappe les \n, \r, et \t
-            .replace(/\n/g, "\\n")
-            .replace(/\r/g, "\\r")
-            .replace(/\t/g, "\\t");
+            // on enlève les \n, \r, et \t
+            .replace(/\n/g, "")
+            .replace(/\r/g, "")
+            .replace(/\t/g, "");
 }
 
 module.exports = Template;

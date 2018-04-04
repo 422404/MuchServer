@@ -1,21 +1,26 @@
-Titre : [[ titre ]]
-[% if a == true %]
-[# commentaire #]
-[[ b ]]
-[% endif %]
-
-[! [[ pas compile ]] !]
-
-[% foreach i in liste %]
-[[ i ]]
-[% endforeach %]
-
-[% foreach i in 0..10 %]
-[#[% if i % 2 === 0 %]#]
-[[ i ]]
-[#[% endif %]#]
-[% endforeach %]
-
-[% foreach i in 10..0 %]
-[[ i ]]
-[% endforeach %]
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    [# On place le titre passé en paramètre #]
+    <title>[[ titre ]]</title>
+  </head>
+  
+  <body>
+    <h1>[[ titre ]] - [[ nb ]]</h1>
+    <em>Code&nbsp;:</em><br />
+    <pre>
+    [!
+    [% foreach i in 1..10 %]
+      [[ i ]] - Wow trop génial !<br />
+    [% endforeach %]
+    !]
+    </pre>
+    <br />
+    <br />
+    <em>Résultat&nbsp;:</em><br />
+    [% foreach i in 1..10 %]
+      [[ i ]] - Wow trop génial !<br />
+    [% endforeach %]
+  </body>
+</html>
