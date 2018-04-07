@@ -7,9 +7,8 @@ class Controleur {
     rendre(requete, reponse, path, params) {
         let html;
         let cheminTemplate = Path.join(__dirname, '../src/vues/', path);
-        
+        let url = Url.parse(requete.url, true);
         let template = MoteurTemplate.getTemplate(cheminTemplate);
-        template.compiler();
         let templateCompilee =  template.creerFonction();
       
         if (typeof params !== 'undefined') {

@@ -10,14 +10,12 @@
     <h1>[[ titre ]] - [[ nb ]]</h1>
     <em>Code&nbsp;:</em><br />
     <pre>
-    [!
-    [% foreach i in 1..10 %]
-      [[ i ]] - Wow trop génial !<br />
-    [% endforeach %]
-    !]
+[!
+[% foreach i in 1..10 %]
+  [[ i ]] - Wow trop génial !
+[% endforeach %]
+!]
     </pre>
-    <br />
-    <br />
     <em>Résultat&nbsp;:</em><br />
     [% foreach i in 1..10 %]
       [[ i ]] - Wow trop génial !<br />

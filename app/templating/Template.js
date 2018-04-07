@@ -23,8 +23,8 @@ const DELIM_BLOC  = ['[%', '%]'];
 const DELIM_COM   = ['[#', '#]'];
 const DELIM_ECHAP = ['[!', '!]'];
 
-const REGEX_COM = /^\[#.*#\]$/;
-const REGEX_ECHAP = /^\[!.*!\]$/;
+const REGEX_COM = /^\[#(.|\n|\t|\r)*#\]$/;
+const REGEX_ECHAP = /\[!(.|\n|\t|\r)*!\]/;
 const REGEX_VAR = /^\[\[ *[a-zA-Z_$][0-9a-zA-Z_$]* *\]\]$/;
 const REGEX_BLOC_IF = /^\[% *if +.+ *%\]$/;
 const REGEX_BLOC_ENDIF = /^\[% *endif *%\]$/;
@@ -88,6 +88,8 @@ class Template {
          * Texte de la template
          */
         this.texteTemplate = Fs.readFileSync(pathTemplate, 'utf-8');
+        
+        this.test = 0;
     }
     
     /**
@@ -100,7 +102,6 @@ class Template {
             if (!this.prochaineExpression()) break;
             
             let type = this.getType();
-            console.log('Expression trouvée | type : ' + type);
             if (type !== typeExpression.COM) {
                 this.pushFIFO(
                     this.texteTemplate.substring(this.debut, this.fin),
@@ -406,8 +407,6 @@ class Template {
                     tab.push(i);
             }
             
-            console.log(tab);
-            
             // on sérialize le tableau
             liste = JSON.stringify(tab);
         } else {
@@ -439,9 +438,9 @@ function echap(texte) {
             .replace(/'/g, "\\\'")
             .replace(/"/g, "\\\"")
             // on enlève les \n, \r, et \t
-            .replace(/\n/g, "")
-            .replace(/\r/g, "")
-            .replace(/\t/g, "");
+            .replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r")
+            .replace(/\t/g, "\\t");
 }
 
 module.exports = Template;
